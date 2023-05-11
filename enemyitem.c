@@ -36,7 +36,7 @@
 
 #define MAXENEMY 6 //최대 적 수
 #define SPEEDITEM "<S>"
-int p1_frame_sync = 5; //플레이어의 이동속도
+int p1_frame_sync = 8; //플레이어의 이동속도
 int keep_moving = 1;  //1:계속이동
 int called = 0;
 int oldx = UX, oldy = UY; // 플레이어의 old 좌표
@@ -44,13 +44,19 @@ int newx = UX, newy = UY; //플레이어의 new 좌표
 int time_out = 100; //
 int frame_count = 0; // game 진행 frame count 로 속도 조절용으로 사용된다.
 int Delay = 10;      //while문 속도조절용으로 사용된다
-int enemyuse = 1;  //1초마다 적 생성
+int enemyuse = 3;  //1초마다 적 생성
 int enemy_frame_sync = 8;
-char* Enemyunit[] = { "★","▒","▣","▼" };
+
+
+char* Enemyunit[] = { "A","B","C","D" };
 int speeditems[WIDTH][HEIGHT] = { 0 };
+
+
+
 int speeditems_count = 0;
 int speeditems_use = 5; //아이템 나타나는 시간(스피드 아이템)
 int item_frame_sync = 10;
+
 struct {
     int exist;  //존재여부
     int x, y;   //x,y좌표
@@ -137,7 +143,9 @@ void showenemy() {
     location = rand() % 2;
     direct = 5 + rand() % 55;
     hieght = 1 + rand() % 8;
-    for (i = 0; i < MAXENEMY && Enemy[i].exist == TRUE; i++) { printf("%d 번째 적 생성",i); }
+
+    for (i = 0; i < MAXENEMY && Enemy[i].exist == TRUE; i++) { printf("%d 번째 적 생성", i+1); }
+
     if (i != MAXENEMY) {
         if (location == 1) {
             Enemy[i].x = direct;
@@ -149,8 +157,8 @@ void showenemy() {
             Enemy[i].y = hieght;
             Enemy[i].move = -1;
         }
-        Enemy[i].type = rand() % 4;
-        Enemy[i].exist = TRUE;
+        Enemy[i].type = rand() % 4;  // 0 1 2 3
+        Enemy[i].exist = TRUE; 
     }
 }
 void Enemymove() {
@@ -164,21 +172,27 @@ void Enemymove() {
                 continue;
             }
             if (Enemy[i].x > 52) {
-                Enemy[i].x -= 1;
-                Enemy[i].move = -1;
-            }
-            else if (Enemy[i].x <= 3) {
-
-                Enemy[i].move = 1;
-                Enemy[i].x += 1;
                 gotoxy(Enemy[i].x, Enemy[i].y);
                 printf(" ");
+
+                Enemy[i].x -= 1;
+                Enemy[i].move = -1;
+                
+            }
+            else if (Enemy[i].x <= 3) {
+                gotoxy(Enemy[i].x, Enemy[i].y);
+                printf(" ");
+                Enemy[i].move = 1;
+                Enemy[i].x += 1;
+              
             }
             else {
+                gotoxy(Enemy[i].x, Enemy[i].y);
+                printf(" ");
                 Enemy[i].x += Enemy[i].move;
                 gotoxy(Enemy[i].x, Enemy[i].y);
                 printf(Enemyunit[Enemy[i].type]);
-                printf(" ");
+                
             }
         }
     }
@@ -202,16 +216,18 @@ void movespeeditem() {
     // gold 수가 없을 수 있다.
     if (speeditems_count == 0)
         return;
+
     for (x = 0; x < WIDTH - 2; x++) {
         for (y = 0; y < HEIGHT; y++) {
             if (speeditems[x][y]) {
-                dx = rand() % 3 - 1; // -1 0 1
-                dy = 1;
+                dx = rand() % 3 - 1; // -1 0 1               /////////
+                dy = 1;                                       
                 nx = x + dx;
                 ny = y + dy;
                 if (nx == WIDTH - 5) nx = WIDTH - 6;
                 if (nx < 7) nx = 8;
                 if (ny < 1) ny = 1;
+
                 if (ny > HEIGHT - 1) {
                     gotoxy(x, y);
                     printf("   ");
@@ -219,10 +235,10 @@ void movespeeditem() {
                 }
                 else {
                     gotoxy(x, y);
-                    textcolor(YELLOW2, BLACK);
-                    printf("   "); // erase gold
+                    textcolor(YELLOW2, BLACK); 
+                    printf("     "); // erase gold
                     gotoxy(nx, ny);
-                    printf(SPEEDITEM);
+                    printf(SPEEDITEM);  
                     newspeeditems[nx][ny] = 1; // 이동된 golds의 좌표
                     textcolor(YELLOW2, BLACK);
                 }
@@ -296,7 +312,6 @@ void playermove(unsigned char ch) {
             speeditems_count--;
             if (p1_frame_sync > 2)
                 p1_frame_sync--;
-           
         }
     }
 }
@@ -310,7 +325,7 @@ void gamestart() {
     start_time = time(NULL);  //게임 시작전 시간
     last_remain_time = remain_time = time_out;
     while (1) {
-       
+
         run_time = time(NULL) - start_time;  // 현재 시간 - 게임시작 전 시간 
         remain_time = time_out - run_time;  //remain_time = 게임종료까지 남은시간
         if (remain_time < last_remain_time) {
@@ -393,7 +408,7 @@ void startmenu() {
         printf("번호를 입력하시오:");
         scanf_s("%d", &a);
         if (a == 1) {
-           
+
             gamestart();
             break;
         }
