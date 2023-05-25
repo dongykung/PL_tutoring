@@ -407,23 +407,29 @@ void Enemymove() {
 				continue;
 			}
 			if (Enemy[i].x > 52) {
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf("    ");
 				Enemy[i].x -= 1;
 				Enemy[i].move = -1;
-
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf(" ");
 
 			}
 			else if (Enemy[i].x <= 3) {
-
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf("    ");
 				Enemy[i].move = 1;
 				Enemy[i].x += 1;
 				gotoxy(Enemy[i].x, Enemy[i].y);
 				printf(" ");
 			}
 			else {
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf("     ");
 				Enemy[i].x += Enemy[i].move;
 				gotoxy(Enemy[i].x, Enemy[i].y);
 				printf(Enemyunit[Enemy[i].type]);
-				printf(" ");
+				printf("    ");
 			}
 		}
 	}
@@ -443,9 +449,9 @@ void Enemyfall() {
 				score += 10;
 				break;
 			}
-		
+
 		}
-	
+
 	}
 }
 void playerfall() {
