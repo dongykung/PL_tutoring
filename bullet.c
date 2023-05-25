@@ -70,6 +70,8 @@ struct {
 struct {
 	int exist;
 	int x, y;
+	int frame;
+	int stay;
 }EnemyBullet[MAXENEMYBULLET];
 struct {
 	int exist;
@@ -277,16 +279,31 @@ void EraseBullet2(int i) {
 }
 void bulletmove() {
 	int i;
-
-	for (i = 0; i < MAXBULLET; i++) {
-		if (Bullet[i].exist == TRUE) {
-			EraseBullet(i);
-			if (Bullet[i].y == 0) {
-				Bullet[i].exist = FALSE;
+	if (p == 0) {
+		for (i = 0; i < MAXBULLET; i++) {
+			if (Bullet[i].exist == TRUE) {
+				EraseBullet(i);
+				if (Bullet[i].y == 0) {
+					Bullet[i].exist = FALSE;
+				}
+				else {
+					Bullet[i].y--;
+					DrawBullet(i);
+				}
 			}
-			else {
-				Bullet[i].y--;
-				DrawBullet(i);
+		}
+	}
+	else {
+		for (i = 0; i < MAXBULLET; i++) {
+			if (Bullet[i].exist == TRUE) {
+				EraseBullet2(i);
+				if (Bullet[i].y == 0) {
+					Bullet[i].exist = FALSE;
+				}
+				else {
+					Bullet[i].y--;
+					DrawBullet2(i);
+				}
 			}
 		}
 	}
@@ -346,7 +363,7 @@ void EnemyBulletMove() {
 				EnemyBullet[i].exist = FALSE;
 			}
 			else {
-				if (random) {  //적의 총알이 플레이어를 따라가는 룆ㄱ
+				if (random) {
 					if (EnemyBullet[i].x <= newx)
 						EnemyBullet[i].x++;
 					else
@@ -390,23 +407,29 @@ void Enemymove() {
 				continue;
 			}
 			if (Enemy[i].x > 52) {
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf("    ");
 				Enemy[i].x -= 1;
 				Enemy[i].move = -1;
-
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf(" ");
 
 			}
 			else if (Enemy[i].x <= 3) {
-
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf("    ");
 				Enemy[i].move = 1;
 				Enemy[i].x += 1;
 				gotoxy(Enemy[i].x, Enemy[i].y);
 				printf(" ");
 			}
 			else {
+				gotoxy(Enemy[i].x, Enemy[i].y);
+				printf("     ");
 				Enemy[i].x += Enemy[i].move;
 				gotoxy(Enemy[i].x, Enemy[i].y);
 				printf(Enemyunit[Enemy[i].type]);
-				printf(" ");
+				printf("    ");
 			}
 		}
 	}
@@ -417,23 +440,18 @@ void Enemyfall() {
 	for (i = 0; i < MAXENEMY; i++) {
 		if (Enemy[i].exist == FALSE || Enemy[i].type == -1)
 			continue;
-		
-		if (Enemy[i].y == Bullet[i].y && abs(Enemy[i].x - Bullet[i].x) <= 7) {   //-7 ~  7
-			gotoxy(Bullet[i].x, Bullet[i].y);
-			printf("   ");
-			Bullet[i].exist = FALSE;
-			Enemy[i].type = -1;
-			score += 10;
-			break;
+		for (int j = 0; j < MAXBULLET; j++) {
+			if (Enemy[i].y == Bullet[j].y && abs(Enemy[i].x - Bullet[j].x) <= 7) {
+				gotoxy(Bullet[j].x, Bullet[j].y);
+				printf("   ");
+				Bullet[j].exist = FALSE;
+				Enemy[i].type = -1;
+				score += 10;
+				break;
+			}
+
 		}
-		if (Enemy[i].y == Misile[i].y && abs(Enemy[i].x - Misile[i].x) <= 10) {
-			gotoxy(Misile[i].x - 2, Misile[i].y); printf("       ");
-			gotoxy(Misile[i].x, Misile[i].y - 1); printf("    ");
-			gotoxy(Misile[i].x, Misile[i].y - 2); printf("    ");
-			Enemy[i].type = -1;
-			Misile[i].exist = FALSE;
-			score += 10;
-		}
+
 	}
 }
 void playerfall() {
@@ -447,7 +465,7 @@ void playerfall() {
 			printf("    ");
 			heart--;
 			p = 0;
-			//system("cls");
+			system("cls");
 		}
 	}
 }
@@ -972,9 +990,7 @@ START:
 				}
 			}
 			if (ch == SPACE) {
-				for (i = 0; i < MAXBULLET && Bullet[i].exist == TRUE; i++) {
-
-				}
+				for (i = 0; i < MAXBULLET && Bullet[i].exist == TRUE; i++) {}
 				if (i != MAXBULLET) {
 					Bullet[i].x = newx + 1;
 					Bullet[i].y = newy - 1;
